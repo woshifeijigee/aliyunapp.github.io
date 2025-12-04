@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>我命令你速度转发给朋友</title>
+  <link href="https://web.sdk.qcloud.com/player/tcplayer/release/v4.2.1/tcplayer.min.css" rel="stylesheet" />
+  <script src="https://web.sdk.qcloud.com/player/tcplayer/release/v4.2.1/libs/hls.min.0.13.2m.js"></script>
+  <script src="https://web.sdk.qcloud.com/player/tcplayer/release/v4.5.0/tcplayer.v4.5.0.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom, #e0f7ff, #ffffff);
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 30px;
+    }
+
+    .video-block {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      margin-bottom: 30px;
+    }
+
+    .video-title {
+      display: block;
+      background: #0094ff;
+      color: white;
+      padding: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      text-align: left; /* 修改为靠左对齐 */
+    }
+
+    .video-title:hover {
+      background: #0079cc;
+    }
+
+    .tcplayer-container {
+      display: none;
+      width: 100%;
+      height: 580px;
+      max-width: 1080px;
+      margin: 20px auto;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .jump-btn {
+      display: none;
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      background-color: #ff6a00;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .jump-btn:hover {
+      background-color: #e85c00;
+    }
+  </style>
+</head>
+<body>
+  <h1>今日份小🍉合集</h1>
+  <div id="content">加载中...</div>
+
+  <script>
+    const players = [];
+    let currentPlayingIndex = null;
+
+    function getLocalData() {
+      return {
+        data_mp4: [
+          { title: "吃🍉丧事喜办 #舞蹈 #气氛组 坟头蹦迪 🐥", url: "http://aod.cos.tx.xmcdn.com/storages/dafb-audiofreehighqps/EE/23/GKwRIasNBb8eACAAAARAueiu.mp4" },
+          { title: "吃🍉牛逼，会玩啊 如此直播", url: "http://aod.cos.tx.xmcdn.com/storages/d37f-audiofreehighqps/41/CC/GAqhntANBb_GACAAAARAuj53.mp4" },
+          { title: "吃🍉 哈哈哈 偷拍站街小妹🐔被追打 .", url: "http://aod.cos.tx.xmcdn.com/storages/f23d-audiofreehighqps/20/F6/GAqhg3wNBcAoACAAAARAumVH.mp4" },
+          { title: "吃🍉果然眼镜才是最反X的.", url: "http://aod.cos.tx.xmcdn.com/storages/4592-audiofreehighqps/4E/7B/GAqhg3wNBcB8ACAAAARAuome.mp4" },
+          { title: "吃🍉偷看小情侣亲热 ", url: "http://aod.cos.tx.xmcdn.com/storages/9b4c-audiofreehighqps/B8/B4/GAqhfD0NBcFUACAAAARAuuRl.mp4" },
+          { title: "吃🍉一场交易马上开始了， 150 今天一定要坚持3分钟", url: "http://aod.cos.tx.xmcdn.com/storages/204f-audiofreehighqps/34/FF/GAqh_aQNBcHEAAthJgRAuw6H.mp4" },
+          { title: "吃🍉 别亲啦！拉丝了都", url: "http://aod.cos.tx.xmcdn.com/storages/c06f-audiofreehighqps/45/6A/GKwRIasNBcIpABCHwQRAuzOb.mp4" },
+          { title: "吃🍉发骚了 要吃🐔", url: "http://aod.cos.tx.xmcdn.com/storages/bceb-audiofreehighqps/77/CB/GKwRIDoNBcKGABySsgRAu2GS.mp4" },
+          { title: "吃🍉两个女的舌吻！多浪费资源啊！", url: "http://aod.cos.tx.xmcdn.com/storages/00a4-audiofreehighqps/7F/AB/GAqhp50NBcLfABLBvARAu4mI.mp4" },
+        ],
+        btn_text: '加入吃瓜微信群',
+        btn_link: 'https://mp.weixin.qq.com/s/EwMupnObyvf00M7Q81jUww',
+        title: '转发＝更新的动力'
+      };
+    }
+
+    async function loadVideos() {
+      const data = getLocalData();
+      document.title = data.title;
+
+      const container = document.getElementById('content');
+      container.innerHTML = '';
+
+      data.data_mp4.forEach((item, index) => {
+        const videoId = "tcplayer-container-" + index;
+        const block = document.createElement('div');
+        block.className = 'video-block';
+        block.innerHTML = `
+          <span class="video-title" data-index="${index}">${index + 1}. ${item.title}</span>
+          <video id="${videoId}" class="tcplayer-container" preload="auto" playsinline webkit-playsinline></video>
+          <button class="jump-btn">${data.btn_text}</button>
+        `;
+        container.appendChild(block);
+
+        const jumpBtn = block.querySelector('.jump-btn');
+        jumpBtn.onclick = () => window.location.href = data.btn_link;
+
+        setTimeout(() => {
+          const player = TCPlayer(videoId, { reportable: false });
+          player.src(item.url);
+          player.pause();
+          players[index] = player;
+        }, 0);
+      });
+
+      document.querySelectorAll('.video-title').forEach(titleElem => {
+        titleElem.addEventListener('click', function () {
+          const index = parseInt(this.getAttribute('data-index'));
+          if (currentPlayingIndex === index) return;
+
+          if (currentPlayingIndex !== null) {
+            const prevVideoElem = document.getElementById("tcplayer-container-" + currentPlayingIndex);
+            if (prevVideoElem) prevVideoElem.style.display = 'none';
+            const prevBlock = prevVideoElem?.parentElement;
+            prevBlock?.querySelector('.jump-btn')?.style.setProperty('display', 'none');
+            players[currentPlayingIndex]?.pause();
+          }
+
+          const currentVideoElem = document.getElementById("tcplayer-container-" + index);
+          currentVideoElem.style.display = 'block';
+          const currentBlock = this.parentElement;
+          currentBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          currentBlock.querySelector('.jump-btn').style.display = 'block';
+          players[index]?.play();
+          currentPlayingIndex = index;
+        });
+      });
+    }
+
+    loadVideos();
+  </script>
+</body>
+</html>
